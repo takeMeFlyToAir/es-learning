@@ -16,6 +16,8 @@ import java.util.stream.Stream;
  */
 public interface IElasticSearchClient<TEntity> extends AutoCloseable {
 
+    void index(String indexName, String id,TEntity entity);
+
     void index(String indexName, IElasticSearchMapping mapping, TEntity entity) throws InterruptedException;
 
     void index(String indexName, IElasticSearchMapping mapping,List<TEntity> entities) throws InterruptedException;
@@ -34,8 +36,9 @@ public interface IElasticSearchClient<TEntity> extends AutoCloseable {
 
     boolean awaitClose(long timeout, TimeUnit unit) throws InterruptedException;
 
-
-
     TEntity getDocumentById(String indexName,String id,Class clazz);
+
+
+    List<TEntity> queryAll(String indexName,Class clazz);
 
 }

@@ -4,6 +4,7 @@
 package com.zzr.business.serviceImpl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPObject;
 import com.zzr.business.config.ESConstant;
 import com.zzr.business.config.ESTransportClientDecorator;
 import com.zzr.core.client.IElasticSearchClient;
@@ -23,6 +24,10 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.Strings;
@@ -30,6 +35,10 @@ import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.mustache.SearchTemplateRequest;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,6 +46,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -70,6 +80,11 @@ public class ElasticSearchClient<TEntity> implements IElasticSearchClient<TEntit
         }catch (Exception e){
 
         }
+    }
+
+    @Override
+    public void index(String indexName, String id,TEntity entity){
+         transportClient.prepareIndex(indexName, ESConstant.INDEX_TYPE, id).setSource(JSONObject.toJSONString(entity), XContentType.JSON).get();
     }
 
     @Override
@@ -148,6 +163,19 @@ public class ElasticSearchClient<TEntity> implements IElasticSearchClient<TEntit
         String sourceAsString = response.getSourceAsString();
         TEntity entity = JSONObject.parseObject(sourceAsString, (Class<TEntity>) clazz);
         return entity;
+    }
+
+
+    @Override
+    public List<TEntity> queryAll(String indexName,Class clazz) {
+        List<TEntity> tEntityList = new ArrayList<TEntity>();
+        SearchRequestBuilder searchRequestBuilder = transportClient.prepareSearch(indexName).setTypes(ESConstant.INDEX_TYPE);
+        SearchResponse searchResponse = searchRequestBuilder.setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
+        SearchHits hits = searchResponse.getHits();
+        hits.forEach(hit -> {
+            tEntityList.add(JSONObject.parseObject(hit.getSourceAsString(),(Class<TEntity>) clazz));
+        });
+        return tEntityList;
     }
 
     @Override

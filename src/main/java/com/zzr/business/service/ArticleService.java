@@ -2,6 +2,8 @@ package com.zzr.business.service;
 
 import com.zzr.business.entity.ArticleEntity;
 
+import java.util.List;
+
 /**
  * Created by zhaozhirong on 2019/10/15.
  */
@@ -19,4 +21,6 @@ public interface ArticleService {
     ArticleEntity getById(String id);
 
     ArticleEntity updateArticleById(ArticleEntity articleEntity);
+
+    List<ArticleEntity> findAll();
 }

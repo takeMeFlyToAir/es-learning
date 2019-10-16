@@ -6,6 +6,8 @@ import com.zzr.business.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Created by zhaozhirong on 2019/10/15.
  */
@@ -23,7 +25,7 @@ public class ArticleServiceImpl implements ArticleService {
     public void add(ArticleEntity articleEntity) throws InterruptedException {
         //TODO 保存数据库
         //保存ES
-        elasticSearchClient.index(INDEX_NAME,articleEntityMapper,articleEntity);
+        elasticSearchClient.index(INDEX_NAME,articleEntity.getId(),articleEntity);
     }
 
     @Override
@@ -45,5 +47,10 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleEntity updateArticleById(ArticleEntity articleEntity) {
         elasticSearchClient.updateDocumentById(INDEX_NAME,articleEntity.getId(),articleEntity);
         return getById(articleEntity.getId());
+    }
+
+    @Override
+    public List<ArticleEntity> findAll() {
+        return elasticSearchClient.queryAll(INDEX_NAME, ArticleEntity.class);
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 /**
  * Created by zhaozhirong on 2019/10/15.
  */
@@ -67,6 +69,17 @@ public class ArticleController {
     public ArticleEntity updateArticleById(ArticleEntity articleEntity){
         try {
             return articleService.updateArticleById(articleEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "findAll", method = {RequestMethod.POST, RequestMethod.GET})
+    public List<ArticleEntity> findAll(){
+        try {
+            return articleService.findAll();
         } catch (Exception e) {
             e.printStackTrace();
         }
