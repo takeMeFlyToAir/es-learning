@@ -28,7 +28,7 @@
     <junit.version>4.12</junit.version>
     <jdk.version>1.8</jdk.version>
     <lombok.version>1.14.2</lombok.version>
-    <elasticsearch.version>6.8.3</elasticsearch.version>
+    <elasticsearch.version>6.8.17</elasticsearch.version>
     <!-- properties -->
   </properties>
 
